@@ -1,3 +1,11 @@
+### VSCode ###
+.vscode/
+
+### AI ###
+.cursor/
+.claude/
+
+
 ### Python ###
 # Byte-compiled / optimized / DLL files
 __pycache__/
