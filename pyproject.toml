@@ -10,10 +10,19 @@ dependencies = [
     "psycopg[binary]>=3.3.3",
     "pydantic>=2.12.5",
     "pydantic-settings>=2.13.1",
-    "pytest>=9.0.3",
     "redis>=7.4.0",
-    "ruff>=0.15.10",
     "sqlalchemy>=2.0.49",
-    "ty>=0.0.29",
     "uvloop>=0.22.1",
+]
+
+[dependency-groups]
+dev = [
+    "ipython>=9.12.0",
+    "pytest>=9.0.3",
+    "pytest-asyncio>=1.3.0",
+    "pytest-coverage>=0.0",
+    "pytest-sugar>=1.1.1",
+    "ruff>=0.15.10",
+    "testcontainers>=4.14.2",
+    "ty>=0.0.29",
 ]
