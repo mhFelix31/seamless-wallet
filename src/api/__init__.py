@@ -7,7 +7,7 @@ from fastapi import APIRouter
 
 IGNORED_FILES = {
     "__init__.py",
-    "deps.py",
+    "dependencies.py",
     "schemas.py",
     "models.py",
     "utils.py",
@@ -21,7 +21,7 @@ IGNORED_DIRS = {
 
 def create_api_router() -> APIRouter:
     main_router = APIRouter()
-    base_dir = Path(__file__).parent  # src/interfaces/rest
+    base_dir = Path(__file__).parent  # src/api/rest
 
     for file in sorted(_iter_python_files(base_dir)):
         module_path = _to_module_path(base_dir, file)
@@ -61,7 +61,7 @@ def _iter_python_files(base_dir: Path):
 def _to_module_path(base_dir: Path, file: Path) -> str:
     relative = file.relative_to(base_dir).with_suffix("")
     parts = relative.parts
-    return "src.interfaces.rest." + ".".join(parts)
+    return "src.api." + ".".join(parts)
 
 
 def _build_prefix(base_dir: Path, file: Path) -> str:
