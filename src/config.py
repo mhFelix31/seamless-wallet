@@ -15,7 +15,7 @@ class Settings(BaseSettings):
     debug: bool = False
     # DB
     database_type: str = "postgres" # Postgres | SQLite | MySQL | mock
-    database_url: str = "postgresql://other@localhost/otherdb"
+    database_url: str = "postgresql+psycopg://other@localhost/otherdb"
 
     # Cache
     cache_type: str = "in_memory" # Redis | Memory | None
