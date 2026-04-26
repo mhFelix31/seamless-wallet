@@ -1,0 +1,6 @@
+from typing import Protocol
+
+
+class TokenService(Protocol):
+    def generate(self, user_uuid: str) -> str: ...
+    def verify(self, token: str) -> dict: ...

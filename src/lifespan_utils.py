@@ -3,15 +3,20 @@ import redis.asyncio as redis
 
 from contextlib import asynccontextmanager
 
+from src.infrastructure.auth.password_hasher.argon2_password_hasher import (
+    Argon2PasswordHasher,
+)
+from src.infrastructure.auth.token_service.jwt_token_service import JWTTokenService
 from src.infrastructure.cache.in_memory import InMemoryCache
 from src.infrastructure.db.session import create_engine_and_session
 
 # TODO maybe split in two files? shutdown.py and start_up.py ???
 
+
 def db_startup(app: FastAPI, db_type: str, db_url: str):
     app.state.db_type = db_type
-    
-    match(db_type):
+
+    match db_type:
         case "postgres":
             engine, session_factory = create_engine_and_session(db_url)
             app.state.db_engine = engine
@@ -23,7 +28,7 @@ def db_startup(app: FastAPI, db_type: str, db_url: str):
 def cache_startup(app: FastAPI, cache_type: str, cache_url: str):
     app.state.cache_type = cache_type
 
-    match(cache_type):
+    match cache_type:
         case "redis":
             redis_client = redis.from_url(cache_url)
             app.state.cache_client = redis_client
@@ -33,10 +38,10 @@ def cache_startup(app: FastAPI, cache_type: str, cache_url: str):
             raise NotImplementedError("Cache type not supported yet.")
 
 
-
 async def db_shutdown(app: FastAPI):
     if hasattr(app.state, "db_engine"):
         await app.state.db_engine.dispose()
+
 
 async def cache_shutdown(app: FastAPI):
     if hasattr(app.state, "cache_client") and app.state.cache_client:
@@ -44,26 +49,37 @@ async def cache_shutdown(app: FastAPI):
             await app.state.cache_client.close()
 
 
+def extra_configs_startup(app: FastAPI, settings) -> FastAPI:
+    password_hasher = Argon2PasswordHasher(secret_pepper=settings.secret_pepper)
+    token_service = JWTTokenService(secret_token=settings.secret_token)
+
+    app.state.password_hasher = password_hasher
+    app.state.token_service = token_service
+    return app
+
+
 def lifespan_factory(settings):
     @asynccontextmanager
     async def lifespan(app: FastAPI):
         app.state.env = settings.environment
         # Start up
+
         db_startup(
             app=app,
             db_type=settings.database_type,
             db_url=settings.database_url,
-            )
+        )
         cache_startup(
             app=app,
             cache_type=settings.cache_type,
             cache_url=settings.cache_url,
-            )
-        
+        )
+        app = extra_configs_startup(app=app, settings=settings)
+
         yield
 
         # Shutdown
         await db_shutdown(app=app)
         await cache_shutdown(app=app)
-    
+
     return lifespan
