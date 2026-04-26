@@ -11,7 +11,7 @@ class LoginHandler:
         self.password_hasher = password_hasher
         self.token_service = token_service
 
-    def handle(self, command: Login):
+    def handle(self, command: Login) -> str:
         user: User = self.user_repository.get_by_email(command.email)
         self.password_hasher.verify(command.password, user.password_hash)
 

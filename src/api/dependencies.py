@@ -2,6 +2,7 @@ from typing import AsyncGenerator
 from fastapi import Depends, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from src.application.auth.handler import LoginHandler
 from src.application.ports.password_hasher import PasswordHasher
 from src.application.ports.token_service import TokenService
 from src.application.ports.cache import Cache
@@ -10,10 +11,13 @@ from src.infrastructure.cache.redis import RedisCache
 
 from src.infrastructure.db.unit_of_work import AsyncUnitOfWork
 from src.infrastructure.factories.health import build_cache_health, build_db_health
-from src.infrastructure.factories.repositories import build_wallet_repository
+from src.infrastructure.factories.repositories import (
+    build_wallet_repository,
+    build_user_repository,
+)
 from fastapi.security import OAuth2PasswordBearer
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/login")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/rest/v1/auth/login/")
 
 
 async def get_session(request: Request) -> AsyncGenerator:
@@ -93,6 +97,26 @@ def get_wallet_repository(request: Request):
     build_wallet_repository(app=request.app)
 
 
+def get_user_repository(request: Request):
+    build_user_repository(app=request.app)
+
+
+# --- End Repository ---
+
+
+def get_login_handler(
+    user_repository=Depends(get_user_repository),
+    password_hasher=Depends(get_password_hasher),
+    token_service=Depends(get_token_service),
+):
+    login_handler = LoginHandler(
+        user_repository=user_repository,
+        password_hasher=password_hasher,
+        token_service=token_service,
+    )
+    return login_handler
+
+
 # --- Cache ---
 def get_cache(
     cache_type=Depends(get_cache_type), cache_client=Depends(get_cache_client)
@@ -104,4 +128,3 @@ def get_cache(
             return cache_client
         case _:
             raise NotImplementedError
-
