@@ -10,8 +10,8 @@ from src.infrastructure.db.session import create_engine_and_session
 
 def db_startup(app: FastAPI, db_type: str, db_url: str):
     app.state.db_type = db_type
-    
-    match(db_type):
+
+    match db_type:
         case "postgres":
             engine, session_factory = create_engine_and_session(db_url)
             app.state.db_engine = engine
@@ -23,7 +23,7 @@ def db_startup(app: FastAPI, db_type: str, db_url: str):
 def cache_startup(app: FastAPI, cache_type: str, cache_url: str):
     app.state.cache_type = cache_type
 
-    match(cache_type):
+    match cache_type:
         case "redis":
             redis_client = redis.from_url(cache_url)
             app.state.cache_client = redis_client
@@ -44,26 +44,32 @@ async def cache_shutdown(app: FastAPI):
             await app.state.cache_client.close()
 
 
+def extra_configs_startup(app: FastAPI, settings) -> FastAPI:
+    return app
+
+
 def lifespan_factory(settings):
     @asynccontextmanager
     async def lifespan(app: FastAPI):
         app.state.env = settings.environment
         # Start up
+
         db_startup(
             app=app,
             db_type=settings.database_type,
             db_url=settings.database_url,
-            )
+        )
         cache_startup(
             app=app,
             cache_type=settings.cache_type,
             cache_url=settings.cache_url,
-            )
-        
+        )
+        app = extra_configs_startup(app=app, settings=settings)
+
         yield
 
         # Shutdown
         await db_shutdown(app=app)
         await cache_shutdown(app=app)
-    
+
     return lifespan
