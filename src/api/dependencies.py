@@ -45,12 +45,12 @@ def is_production(env = Depends(get_env)):
 
 
 async def check_db(db_type, db_engine) -> str:
-    health = build_db_health(db_type=db_type,db_engine=db_engine)
+    health = build_db_health(db_type=db_type, db_engine=db_engine)
     return "ok" if await health.is_healthy() else "failed"
         
 
 async def check_cache(cache_type, cache_client) -> str:
-    health = build_cache_health(cache_type=cache_type,cache_client=cache_client)
+    health = build_cache_health(cache_type=cache_type, cache_client=cache_client)
     return "ok" if await health.is_healthy() else "failed"
 
 # --- Repository ---
