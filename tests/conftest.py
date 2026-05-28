@@ -1,13 +1,11 @@
-from contextlib import contextmanager
 import copy
 import tempfile
+from contextlib import contextmanager
+
 import pytest
-
 from fastapi.testclient import TestClient
-
 from testcontainers.postgres import PostgresContainer
 from testcontainers.redis import RedisContainer
-
 
 from src.config import settings
 from src.main import create_app
@@ -49,8 +47,8 @@ def db_url(request):
 # --------------------
 @pytest.fixture(scope="session", autouse=True)
 def apply_migrations(postgres_url):
-    from alembic.config import Config
     from alembic import command
+    from alembic.config import Config
 
     alembic_cfg = Config("alembic.ini")
     alembic_cfg.set_main_option("sqlalchemy.url", postgres_url)
@@ -58,7 +56,6 @@ def apply_migrations(postgres_url):
     command.upgrade(alembic_cfg, "head")
     yield
     command.downgrade(alembic_cfg, "base")
-
 
 
 # --------------------
@@ -74,6 +71,7 @@ def redis_container():
 def redis_url(redis_container):
     return f"redis://{redis_container.get_container_host_ip()}:{redis_container.get_exposed_port(redis_container.port)}"
 
+
 # TestClient
 @pytest.fixture
 def client_factory():
@@ -82,13 +80,16 @@ def client_factory():
         app = create_app(custom_settings)
         with TestClient(app=app, base_url="http://test") as client:
             yield client
+
     return _client
+
 
 @pytest.fixture(scope="session")
 def mock_setting():
     _settings = copy.deepcopy(settings)
     _settings.environment = "TEST"
     return _settings
+
 
 @pytest.fixture
 def default_client(client_factory, mock_setting, postgres_url, redis_url):
@@ -98,4 +99,3 @@ def default_client(client_factory, mock_setting, postgres_url, redis_url):
     mock_setting.cache_type = "redis"
     with client_factory(mock_setting) as client:
         yield client
-    

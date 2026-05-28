@@ -1,6 +1,6 @@
-
 from datetime import datetime, timezone
 from decimal import Decimal
+
 from sqlalchemy import DateTime, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -16,7 +16,7 @@ class CurrencyModel(Base):
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         default=lambda: datetime.now(timezone.utc),
-        nullable=False
+        nullable=False,
     )
 
 
@@ -31,5 +31,5 @@ class ExchangeRateModel(Base):
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         default=lambda: datetime.now(timezone.utc),
-        nullable=False
+        nullable=False,
     )

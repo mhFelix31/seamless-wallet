@@ -1,7 +1,9 @@
 from uuid import UUID
-from src.domain.wallet.repository import WalletRepository
+
 from src.domain.wallet.entities import Wallet
+from src.domain.wallet.repository import WalletRepository
 from src.infrastructure.db.models.wallet_model import WalletModel
+
 
 class SQLAlchemyWalletRepository(WalletRepository):
     def __init__(self, session):
@@ -21,13 +23,8 @@ class SQLAlchemyWalletRepository(WalletRepository):
         return True
         # END FIXME
 
-    def _to_model(self, wallet:Wallet) ->  WalletModel:
-        return WalletModel(
-            uuid=str(wallet.uuid)
-        )
+    def _to_model(self, wallet: Wallet) -> WalletModel:
+        return WalletModel(uuid=str(wallet.uuid))
 
-    def _to_domain(self, model:WalletModel) -> Wallet:
-        return Wallet(
-            uuid=UUID(model.uuid),
-            name=""
-        )
+    def _to_domain(self, model: WalletModel) -> Wallet:
+        return Wallet(uuid=UUID(model.uuid), name="")
