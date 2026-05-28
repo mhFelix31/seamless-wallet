@@ -1,5 +1,7 @@
 from typing import Protocol
+
 from redis.asyncio.client import Redis
+
 from src.application.ports.cache import Cache
 from src.application.ports.health import HealthCheck
 
@@ -14,8 +16,10 @@ class RedisCache(Cache):
     async def set(self, key: str, value: str, ttl=None):
         await self.client.set(key, value, ex=ttl)
 
+
 class AsyncCacheClient(Protocol):
     async def ping(self): ...
+
 
 class RedisHealthCheck(HealthCheck):
     def __init__(self, client: AsyncCacheClient):

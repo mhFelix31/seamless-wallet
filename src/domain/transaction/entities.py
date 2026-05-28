@@ -5,11 +5,11 @@ from uuid import UUID, uuid4
 from src.domain.shared.money import Money
 
 # MAYBE
-#class Entry:
+# class Entry:
 #    wallet_id: UUID
 #    amount: Money
 
-#class Transaction:
+# class Transaction:
 #    id: UUID
 #    entries: list[Entry]
 # ENDMAYBE
@@ -19,7 +19,7 @@ from src.domain.shared.money import Money
 class Transaction:
     source_uuid: UUID
     receiver_uuid: UUID
-    
+
     amount: Money
 
     uuid: UUID = field(default_factory=uuid4)

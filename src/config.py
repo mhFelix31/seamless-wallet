@@ -1,12 +1,14 @@
-from pydantic_settings import BaseSettings, SettingsConfigDict
 from pydantic import (
-    Field,
     AliasChoices,
+    Field,
 )
+from pydantic_settings import BaseSettings, SettingsConfigDict
+
 # This file should be only imported on main.py
 # Why?
 # On main.py is where we inject the settings, anything that has to be loaded outside there should get through the app
 # This decouples the Main settings from the app structure, making easier to test and guarantee behavior.
+
 
 class Settings(BaseSettings):
     app_name: str = "Wallet"
@@ -28,4 +30,3 @@ class Settings(BaseSettings):
 
 
 settings = Settings()
-

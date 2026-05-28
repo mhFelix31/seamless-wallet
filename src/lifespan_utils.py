@@ -1,12 +1,13 @@
-from fastapi import FastAPI
-import redis.asyncio as redis
-
 from contextlib import asynccontextmanager
+
+import redis.asyncio as redis
+from fastapi import FastAPI
 
 from src.infrastructure.cache.in_memory import InMemoryCache
 from src.infrastructure.db.session import create_engine_and_session
 
 # TODO maybe split in two files? shutdown.py and start_up.py ???
+
 
 def db_startup(app: FastAPI, db_type: str, db_url: str):
     app.state.db_type = db_type
@@ -33,10 +34,10 @@ def cache_startup(app: FastAPI, cache_type: str, cache_url: str):
             raise NotImplementedError("Cache type not supported yet.")
 
 
-
 async def db_shutdown(app: FastAPI):
     if hasattr(app.state, "db_engine"):
         await app.state.db_engine.dispose()
+
 
 async def cache_shutdown(app: FastAPI):
     if hasattr(app.state, "cache_client") and app.state.cache_client:

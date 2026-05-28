@@ -1,5 +1,4 @@
-
-
 class DifferentCurrenciesException(Exception): ...
+
 
 class NotAddingWithMoneyException(Exception): ...

@@ -3,8 +3,6 @@ from pathlib import Path
 
 from fastapi import APIRouter
 
-
-
 IGNORED_FILES = {
     "__init__.py",
     "dependencies.py",
