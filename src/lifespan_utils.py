@@ -4,6 +4,10 @@ import redis.asyncio as redis
 from fastapi import FastAPI
 
 from src.enums import CacheType
+from src.infrastructure.auth.password_hasher.argon2_password_hasher import (
+    Argon2PasswordHasher,
+)
+from src.infrastructure.auth.token_service.jwt_token_service import JWTTokenService
 from src.infrastructure.cache.in_memory import InMemoryCache
 from src.infrastructure.db.session import create_engine_and_session
 from src.infrastructure.db.utils import SQL_ALCHEMY_DB_LIST
@@ -46,6 +50,13 @@ async def cache_shutdown(app: FastAPI):
 
 
 def extra_configs_startup(app: FastAPI, settings) -> FastAPI:
+    password_hasher = Argon2PasswordHasher(secret_pepper=settings.secret_pepper)
+    token_service = JWTTokenService(
+        priv_token_key=settings.secret_token, env_token_pub_list=[]
+    )
+
+    app.state.password_hasher = password_hasher
+    app.state.token_service = token_service
     return app
 
 
