@@ -6,6 +6,7 @@ from .entities import Currency, ExchangeRate
 
 class CurrencyRepository(Protocol):
     def save(self, cur: Currency) -> bool: ...
+    def get_by_code(self, code: str) -> Currency: ...
 
 
 class ExchangeRateRepository(Protocol):

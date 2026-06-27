@@ -7,8 +7,8 @@ from sqlalchemy.orm import Mapped, mapped_column
 from src.infrastructure.db.base import Base
 
 
-class WalletTransactionSnapshot(Base):
-    __tablename__ = "wallet_transaction_snapshot"
+class WalletSnapshot(Base):
+    __tablename__ = "wallet_snapshot"
 
     uuid: Mapped[str] = mapped_column(
         String(36), primary_key=True, default=lambda: str(uuid4())

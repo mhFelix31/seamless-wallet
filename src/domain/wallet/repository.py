@@ -1,7 +1,13 @@
 from typing import Protocol
 
-from .entities import Wallet
+from .entities import Wallet, WalletTransactionSnapshot
 
 
 class WalletRepository(Protocol):
+    def get_by_id(self, uuid: str) -> Wallet: ...
     def save(self, wallet: Wallet) -> bool: ...
+
+
+class WalletSnapshotRepository(Protocol):
+    def get_by_wallet_id(self, wallet_id) -> list[WalletTransactionSnapshot]: ...
+    def get_latest_by_wallet_id(self, wallet_id: str) -> WalletTransactionSnapshot: ...
