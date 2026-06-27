@@ -30,7 +30,7 @@ target_metadata = Base.metadata
 # ... etc.
 url = config.get_main_option("sqlalchemy.url")
 
-if not url:
+if not url or url.startswith("driver://"):
     url = settings.database_url
     config.set_main_option("sqlalchemy.url", url)
 
