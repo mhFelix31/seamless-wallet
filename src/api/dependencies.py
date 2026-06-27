@@ -1,13 +1,23 @@
 from typing import AsyncGenerator
 
-from fastapi import Depends, Request
+from fastapi import Depends, HTTPException, Request, status
+from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from src.application.auth.handler import LoginHandler
 from src.application.ports.cache import Cache
+from src.application.ports.password_hasher import PasswordHasher
+from src.application.ports.token_service import TokenService
+from src.domain.user.entities import User
 from src.infrastructure.cache.redis import RedisCache
 from src.infrastructure.db.unit_of_work import AsyncUnitOfWork
 from src.infrastructure.factories.health import build_cache_health, build_db_health
-from src.infrastructure.factories.repositories import build_wallet_repository
+from src.infrastructure.factories.repositories import (
+    build_user_repository,
+    build_wallet_repository,
+)
+
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/rest/v1/auth/login/")
 
 
 async def get_session(request: Request) -> AsyncGenerator:
@@ -43,9 +53,19 @@ def get_a_uow(
     return AsyncUnitOfWork(session)
 
 
-def get_env(request: Request):
+def get_env(request: Request) -> str:
     env = request.app.state.env
     return env
+
+
+def get_password_hasher(request: Request) -> PasswordHasher:
+    password_hasher: PasswordHasher = request.app.state.password_hasher
+    return password_hasher
+
+
+def get_token_service(request: Request) -> TokenService:
+    token_service: TokenService = request.app.state.token_service
+    return token_service
 
 
 def is_production(env=Depends(get_env)):
@@ -65,7 +85,29 @@ async def check_cache(cache_type, cache_client) -> str:
 
 # --- Repository ---
 def get_wallet_repository(request: Request):
-    build_wallet_repository(app=request.app)
+    repository = build_wallet_repository(app=request.app)
+    return repository
+
+
+def get_user_repository(request: Request):
+    repository = build_user_repository(app=request.app)
+    return repository
+
+
+# --- End Repository ---
+
+
+def get_login_handler(
+    user_repository=Depends(get_user_repository),
+    password_hasher=Depends(get_password_hasher),
+    token_service=Depends(get_token_service),
+):
+    login_handler = LoginHandler(
+        user_repository=user_repository,
+        password_hasher=password_hasher,
+        token_service=token_service,
+    )
+    return login_handler
 
 
 # --- Cache ---
@@ -79,3 +121,39 @@ def get_cache(
             return cache_client
         case _:
             raise NotImplementedError
+
+
+def get_current_user(
+    token=Depends(oauth2_scheme),
+    token_service: TokenService = Depends(get_token_service),
+):
+    payload = token_service.verify(token)
+    user_uuid = payload["u"]
+    return user_uuid
+
+
+def get_user_role(
+    user_uuid=Depends(get_current_user), user_repository=Depends(get_user_repository)
+):
+    user: User = user_repository.get(user_uuid)
+    if not user:
+        raise Exception("No user")  # TODO change to proper Exception
+
+    role = user.role
+    return role
+
+
+def require_permissions(
+    roles_with_permission: list[str],
+):
+    async def _require_permission(user_role=Depends(get_user_role)):
+        # Permission check
+        matching_permission = user_role in roles_with_permission
+
+        if not matching_permission:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Not enough permissions",
+            )  # TODO change to proper Exception
+
+    return _require_permission

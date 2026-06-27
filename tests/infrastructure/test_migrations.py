@@ -45,7 +45,7 @@ def test_upgrade_downgrade_cycle(db_url, alembic_runner):
 
 
 @pytest.mark.migration
-@pytest.mark.parametrize("table", ["wallets", "transactions"])
+@pytest.mark.parametrize("table", ["users"])
 @pytest.mark.parametrize("db_url", available_dbs(), indirect=True)
 def test_table_created(db_url, table, alembic_runner):
     alembic_runner["upgrade"]("head")
