@@ -16,7 +16,7 @@ from src.main import create_app
 # --------------------
 @pytest.fixture(scope="session")
 def postgres_container():
-    with PostgresContainer("postgres:16") as postgres:
+    with PostgresContainer("sqlalchemy:16") as postgres:
         yield postgres
 
 
@@ -34,8 +34,8 @@ def db_url(request):
             with tempfile.NamedTemporaryFile(suffix=".db") as f:
                 yield f"sqlite+pysqlite:///{f.name}"
 
-        case "postgres":
-            with PostgresContainer("postgres:16") as pg:
+        case "sqlalchemy":
+            with PostgresContainer("sqlalchemy:16") as pg:
                 yield pg.get_connection_url(driver="psycopg")
 
         case _:
@@ -94,7 +94,7 @@ def mock_setting():
 @pytest.fixture
 def default_client(client_factory, mock_setting, postgres_url, redis_url):
     mock_setting.database_url = postgres_url
-    mock_setting.database_type = "postgres"
+    mock_setting.database_type = "sqlalchemy"
     mock_setting.cache_url = redis_url
     mock_setting.cache_type = "redis"
     with client_factory(mock_setting) as client:

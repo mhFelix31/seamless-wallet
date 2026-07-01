@@ -1,6 +1,7 @@
 from copy import deepcopy
 from dataclasses import dataclass, field
 from uuid import UUID, uuid4
+
 from src.domain.currency.entities import Currency
 from src.domain.shared.date_range import DateRange
 from src.domain.shared.money import Money
@@ -15,15 +16,13 @@ class Wallet:
 
 @dataclass(frozen=True)
 class WalletSnapshot:
-    uuid: UUID = field(default_factory=uuid4)
-    
     wallet: Wallet
     last_transaction_internal_id: int
-
     down_uuid: UUID | None
-    down_balance: dict[Currency, Money] = field(default_factory=dict)
-
     snapshot_date_range: DateRange
+
+    uuid: UUID = field(default_factory=uuid4)
+    down_balance: dict[Currency, Money] = field(default_factory=dict)
 
     @property
     def balance(self) -> dict[Currency, Money]:
@@ -35,5 +34,3 @@ class WalletSnapshot:
 
             cur_balance[cur_currency] += transaction.amount
         return cur_balance
-                
-

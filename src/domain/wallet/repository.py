@@ -1,6 +1,6 @@
 from typing import Protocol
 
-from .entities import Wallet, WalletTransactionSnapshot
+from .entities import Wallet, WalletSnapshot
 
 
 class WalletRepository(Protocol):
@@ -9,5 +9,5 @@ class WalletRepository(Protocol):
 
 
 class WalletSnapshotRepository(Protocol):
-    def get_by_wallet_id(self, wallet_id) -> list[WalletTransactionSnapshot]: ...
-    def get_latest_by_wallet_id(self, wallet_id: str) -> WalletTransactionSnapshot: ...
+    def get_by_wallet_id(self, wallet_id) -> list[WalletSnapshot]: ...
+    def get_latest_by_wallet_id(self, wallet_id: str) -> WalletSnapshot: ...

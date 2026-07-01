@@ -1,11 +1,14 @@
 from datetime import datetime
-from typing import Protocol
 
 from domain.transaction.entities import Transaction
+from domain.transaction.repository import TransactionRepository
 from domain.wallet.entities import Wallet, WalletSnapshot
 
 
-class TransactionRepository(Protocol):
+class SQLAlchemyTransactionRepository(TransactionRepository):
+    def __init__(self, session):
+        self.session = session
+
     def save(self, txn: Transaction) -> Transaction: ...
 
     def get_by_wallet(

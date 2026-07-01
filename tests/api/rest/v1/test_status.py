@@ -14,9 +14,9 @@ def test_all_checks_happy_path(check_param, default_client):
 
 @pytest.mark.e2e
 def test_all_checks_with_failed_parameter(mock_setting, client_factory):
-    mock_setting.database_type = "postgres"
+    mock_setting.database_type = "sqlalchemy"
     mock_setting.database_url = (
-        "postgresql+psycopg://postgres:password@invalid:5432/app"
+        "postgresql+psycopg://sqlalchemy:password@invalid:5432/app"
     )
     mock_setting.cache_type = "redis"
     mock_setting.cache_url = "redis://invalid:6379/0"

@@ -9,7 +9,7 @@ from sqlalchemy import create_engine, text
 def available_dbs() -> list[str]:
     return [
         "sqlite",
-        "postgres",
+        "sqlalchemy",
     ]
 
 

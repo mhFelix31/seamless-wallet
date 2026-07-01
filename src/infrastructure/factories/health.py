@@ -1,13 +1,13 @@
 from src.application.ports.health import HealthCheck
 from src.infrastructure.cache.in_memory import InMemoryHealthCheck
 from src.infrastructure.cache.redis import RedisHealthCheck
-from src.infrastructure.db.postgres.health import SQLAlchemyHealthCheck
+from src.infrastructure.db.sqlalchemy.health import SQLAlchemyHealthCheck
 
 
 def build_db_health(db_type, db_engine) -> HealthCheck:
 
     match db_type:
-        case "postgres":
+        case "sqlalchemy":
             return SQLAlchemyHealthCheck(db_engine)
         case _:
             raise NotImplementedError

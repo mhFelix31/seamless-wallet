@@ -7,7 +7,12 @@ from src.application.ports.cache import Cache
 from src.infrastructure.cache.redis import RedisCache
 from src.infrastructure.db.unit_of_work import AsyncUnitOfWork
 from src.infrastructure.factories.health import build_cache_health, build_db_health
-from src.infrastructure.factories.repositories import build_currency_repository, build_transaction_repository, build_wallet_repository, build_wallet_snapshot_repository
+from src.infrastructure.factories.repositories import (
+    build_currency_repository,
+    build_transaction_repository,
+    build_wallet_repository,
+    build_wallet_snapshot_repository,
+)
 
 
 async def get_session(request: Request) -> AsyncGenerator:
@@ -67,11 +72,14 @@ async def check_cache(cache_type, cache_client) -> str:
 def get_wallet_repository(request: Request):
     build_wallet_repository(app=request.app)
 
+
 def get_currency_repository(request: Request):
     build_currency_repository(app=request.app)
 
+
 def get_transaction_repository(request: Request):
     build_transaction_repository(app=request.app)
+
 
 def get_snapshot_repository(request: Request):
     build_wallet_snapshot_repository(app=request.app)
@@ -89,7 +97,9 @@ def get_cache(
         case _:
             raise NotImplementedError
 
+
 #
+
 
 def get_source_id():
     # This should retrieve the ID based on token, which is not implemented yet

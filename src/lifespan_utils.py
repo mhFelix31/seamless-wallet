@@ -3,6 +3,7 @@ from contextlib import asynccontextmanager
 import redis.asyncio as redis
 from fastapi import FastAPI
 
+from config import Settings
 from src.enums import CacheType
 from src.infrastructure.cache.in_memory import InMemoryCache
 from src.infrastructure.db.session import create_engine_and_session
@@ -49,7 +50,7 @@ def extra_configs_startup(app: FastAPI, settings) -> FastAPI:
     return app
 
 
-def lifespan_factory(settings):
+def lifespan_factory(settings: Settings):
     @asynccontextmanager
     async def lifespan(app: FastAPI):
         app.state.env = settings.environment
@@ -57,8 +58,8 @@ def lifespan_factory(settings):
 
         db_startup(
             app=app,
-            db_type=settings.database_type,
-            db_url=settings.database_url,
+            db_type=settings.db_type,
+            db_url=settings.db_url,
         )
         cache_startup(
             app=app,

@@ -21,7 +21,7 @@ class Settings(BaseSettings):
     debug: bool = False
     # DB
     db_type: str = DBtype.SQLITE  # Postgres | SQLite | MySQL | mock
-    db_url: str = "sqlite:///app.db"
+    db_url: str = "sqlite+aiosqlite:///app.db"
 
     # Cache
     cache_type: str = CacheType.IN_MEMORY  # Redis | Memory | None
