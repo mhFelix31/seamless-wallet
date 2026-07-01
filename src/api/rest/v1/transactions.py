@@ -23,7 +23,7 @@ router = APIRouter()
 # Deposit from outside
 @router.post("/deposit", response_model=TransactionResponseDTO)
 async def deposit(
-    transfer: ExternalTransferDTO,
+    transfer_dto: ExternalTransferDTO,
     bank_id: str = Depends(get_source_id),
     currency_repo: CurrencyRepository = Depends(get_currency_repository),
     wallet_repo: WalletRepository = Depends(get_wallet_repository),
@@ -36,13 +36,13 @@ async def deposit(
         snapshot_repo=snapshot_repo,
         transaction_repo=transaction_repo,
     )
-    return handler.deposit(transfer=transfer, bank_id=bank_id)
+    return handler.deposit(transfer=transfer_dto, bank_id=bank_id)
 
 
 # Withdraw to outside
 @router.post("/withdraw")
 async def withdraw(
-    transfer: ExternalTransferDTO,
+    transfer_dto: ExternalTransferDTO,
     bank_id: str = Depends(get_source_id),
     currency_repo: CurrencyRepository = Depends(get_currency_repository),
     wallet_repo: WalletRepository = Depends(get_wallet_repository),
@@ -55,13 +55,13 @@ async def withdraw(
         snapshot_repo=snapshot_repo,
         transaction_repo=transaction_repo,
     )
-    return handler.withdraw(transfer=transfer, bank_id=bank_id)
+    return handler.withdraw(transfer=transfer_dto, bank_id=bank_id)
 
 
 # Transfer to internal account
 @router.post("/transfer")
 async def transfer(
-    transfer: TransferDTO,
+    transfer_dto: TransferDTO,
     source_id: str = Depends(get_source_id),
     currency_repo: CurrencyRepository = Depends(get_currency_repository),
     wallet_repo: WalletRepository = Depends(get_wallet_repository),
@@ -74,4 +74,4 @@ async def transfer(
         snapshot_repo=snapshot_repo,
         transaction_repo=transaction_repo,
     )
-    return handler.transfer(source_id=source_id, transfer=transfer)
+    return handler.transfer(source_id=source_id, transfer=transfer_dto)

@@ -99,3 +99,10 @@ def default_client(client_factory, mock_setting, postgres_url, redis_url):
     mock_setting.cache_type = "redis"
     with client_factory(mock_setting) as client:
         yield client
+
+
+@pytest.fixture
+def db_session(default_client):
+    session = default_client.app.state.session_factory()
+    yield session
+    session.close()
